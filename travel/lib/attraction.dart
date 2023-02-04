@@ -7,6 +7,8 @@ import 'model/attraction_detail.dart';
 import 'component/pageview_tile.dart';
 import 'component/gridview_tile.dart';
 import 'description.dart';
+import 'package:provider/provider.dart';
+import 'model/content.dart';
 
 class Attraction extends StatefulWidget {
   const Attraction({super.key});
@@ -33,7 +35,11 @@ class _AttractionState extends State<Attraction> {
           introduction: eachAttraction['introduction'],
           destric: eachAttraction['distric'],
           tele: eachAttraction['tel'],
-          images: eachAttraction['images']);
+          images: eachAttraction['images'],
+          address: eachAttraction['address'],
+          remind: eachAttraction['remind'],
+          url: eachAttraction['url']);
+
       attractionDetails.add(recommendDetail);
     }
     setState(() {});
@@ -53,7 +59,10 @@ class _AttractionState extends State<Attraction> {
           introduction: eachAttraction['introduction'],
           destric: eachAttraction['distric'],
           tele: eachAttraction['tel'],
-          images: eachAttraction['images']);
+          images: eachAttraction['images'],
+          address: eachAttraction['address'],
+          remind: eachAttraction['remind'],
+          url: eachAttraction['url']);
       attractionDetailForGrid.add(attractionDetail);
     }
     setState(() {});
@@ -70,132 +79,126 @@ class _AttractionState extends State<Attraction> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 237, 242, 245),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: 400,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Text(
-                      '找尋台北最美景點?',
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.notoSans(fontSize: 30),
-                    ),
-                    Row(
+        body: SafeArea(child: Consumer<Content>(
+          builder: ((context, content, child) {
+            return Column(
+              children: [
+                Container(
+                  width: 400,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '找尋台北最美景點?',
+                        textAlign: TextAlign.left,
+                        style: GoogleFonts.notoSans(fontSize: 30),
+                      ),
+                      Row(
+                        children: [
+                          content.buildIcon(0),
+                          content.buildIcon(1),
+                          content.buildIcon(2),
+                          content.buildIcon(3)
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        PictureIcon(
-                          icon: Icons.synagogue,
-                          text: '寺廟',
+                        Text(
+                          '推薦行程',
+                          style: GoogleFonts.sail(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        PictureIcon(
-                          icon: Icons.restaurant,
-                          text: '食物',
-                        ),
-                        PictureIcon(
-                          icon: Icons.local_library,
-                          text: '藝術',
-                        ),
-                        PictureIcon(
-                          icon: Icons.shopping_bag,
-                          text: '購物',
+                        Text(
+                          '更多',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 115, 162, 203)),
                         )
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 16),
+                  height: 200,
+                  decoration:
+                      BoxDecoration(color: Color.fromARGB(255, 243, 241, 235)),
+                  child: PageView.builder(
+                      controller: PageController(viewportFraction: 0.8),
+                      itemCount: attractionDetails.length - 1,
+                      itemBuilder: ((context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: ((context) {
+                              return Description(
+                                image: attractionDetails[index].images,
+                                name: attractionDetails[index].name,
+                                destric: attractionDetails[index].destric,
+                                introduction:
+                                    attractionDetails[index].introduction,
+                                telephone: attractionDetails[index].tele,
+                                address: attractionDetails[index].address,
+                                remind: attractionDetails[index].remind,
+                                url: attractionDetails[index].url,
+                              );
+                            })));
+                          },
+                          child: PageViewTile(
+                            image: attractionDetails[index].images[0]['src'],
+                            destric: attractionDetails[index].destric,
+                            name: attractionDetails[index].name,
+                          ),
+                        );
+                      })),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        '推薦行程',
+                        '${content.text}',
                         style: GoogleFonts.sail(
                             fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '更多',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 115, 162, 203)),
                       )
                     ],
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 16),
-                height: 200,
-                decoration:
-                    BoxDecoration(color: Color.fromARGB(255, 243, 241, 235)),
-                child: PageView.builder(
-                    controller: PageController(viewportFraction: 0.8),
-                    itemCount: attractionDetails.length - 1,
-                    itemBuilder: ((context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: ((context) {
-                            return Description(
-                              image: attractionDetails[index].images,
-                              name: attractionDetails[index].name,
-                              destric: attractionDetails[index].destric,
-                              introduction:
-                                  attractionDetails[index].introduction,
-                            );
-                          })));
-                        },
-                        child: PageViewTile(
-                          image: attractionDetails[index].images[0]['src'],
-                          destric: attractionDetails[index].destric,
-                          name: attractionDetails[index].name,
-                        ),
-                      );
-                    })),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      '旅遊景點',
-                      style: GoogleFonts.sail(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  height: 400,
-                  width: MediaQuery.of(context).size.width,
-                  decoration:
-                      BoxDecoration(color: Color.fromARGB(255, 244, 242, 238)),
-                  child: GridView.builder(
-                      itemCount: attractionDetailForGrid.length - 6,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
-                      itemBuilder: ((context, index) {
-                        return GridViewTile(
-                            name: attractionDetailForGrid[index].name,
-                            destric: attractionDetailForGrid[index].destric,
-                            image: attractionDetailForGrid[index].images[0]
-                                ['src']);
-                      })),
-                ),
-              )
-            ],
-          ),
-        ));
+                Expanded(
+                  child: Container(
+                    height: 400,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 244, 242, 238)),
+                    child: GridView.builder(
+                        itemCount: attractionDetailForGrid.length - 6,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                        itemBuilder: ((context, index) {
+                          return GridViewTile(
+                              name: attractionDetailForGrid[index].name,
+                              destric: attractionDetailForGrid[index].destric,
+                              image: attractionDetailForGrid[index].images[0]
+                                  ['src']);
+                        })),
+                  ),
+                )
+              ],
+            );
+          }),
+        )));
   }
 }

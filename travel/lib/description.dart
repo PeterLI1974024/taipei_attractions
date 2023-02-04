@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'model/attraction_detail.dart';
 import 'component/indicator.dart';
 
 class Description extends StatefulWidget {
   final String introduction;
   final String name;
-  //  final String address;
+  final String address;
   final String destric;
-  //  final String telephone;
+  final String telephone;
+  final String remind;
+  final String url;
   final image;
 
   Description(
       {required this.name,
-      // required this.address,
+      required this.address,
       required this.destric,
-      // required this.telephone,
+      required this.telephone,
       required this.image,
       required this.introduction,
+      required this.remind,
+      required this.url,
       super.key});
 
   @override
@@ -39,6 +44,7 @@ class _DescriptionState extends State<Description>
   @override
   void initState() {
     getImage();
+
     super.initState();
   }
 
@@ -108,10 +114,102 @@ class _DescriptionState extends State<Description>
             decoration: BoxDecoration(
                 color: Color.fromARGB(255, 236, 234, 230),
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(50))),
-            height: 300,
             child: TabBarView(controller: tabController, children: [
               Container(
-                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.name,
+                        style: TextStyle(fontSize: 26),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        widget.destric,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      widget.remind.isNotEmpty
+                          ? const SizedBox(
+                              height: 10,
+                            )
+                          : SizedBox(
+                              height: 0,
+                            ),
+                      widget.remind.isNotEmpty
+                          ? Icon(
+                              Icons.info,
+                              color: Color.fromARGB(255, 187, 159, 75),
+                            )
+                          : SizedBox(height: 0),
+                      Text(
+                        widget.remind,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      widget.remind.isNotEmpty
+                          ? SizedBox(height: 10)
+                          : SizedBox(
+                              height: 0,
+                            ),
+                      Icon(
+                        Icons.explore,
+                        color: Color.fromARGB(255, 176, 160, 115),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        widget.address,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        print('pressed');
+                                        final Uri url = Uri(
+                                            scheme: 'tel',
+                                            path: widget.telephone);
+                                        await launch(url.toString());
+                                      },
+                                      icon: Icon(Icons.call,
+                                          size: 30,
+                                          color: Color.fromARGB(
+                                              255, 162, 119, 115)),
+                                    ),
+                                    IconButton(
+                                        onPressed: () async {
+                                          final Uri url = Uri(
+                                              scheme: 'link', path: widget.url);
+                                          await launch(url.toString());
+                                        },
+                                        icon: Icon(
+                                          Icons.home,
+                                          size: 30,
+                                          color: Color.fromARGB(
+                                              255, 162, 119, 115),
+                                        ))
+                                  ],
+                                )
+                              ]),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(24.0),
