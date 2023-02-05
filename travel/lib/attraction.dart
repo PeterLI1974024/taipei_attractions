@@ -9,6 +9,7 @@ import 'component/gridview_tile.dart';
 import 'description.dart';
 import 'package:provider/provider.dart';
 import 'model/content.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Attraction extends StatefulWidget {
   const Attraction({super.key});
@@ -19,7 +20,6 @@ class Attraction extends StatefulWidget {
 
 class _AttractionState extends State<Attraction> {
   List<AttractionDetail> attractionDetails = [];
-  List<AttractionDetail> attractionDetailForGrid = [];
 
   final String requestUrl =
       'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=17&page=1';
@@ -45,33 +45,10 @@ class _AttractionState extends State<Attraction> {
     setState(() {});
   }
 
-  Future getAttraction() async {
-    final String requestUrl =
-        'https://www.travel.taipei/open-api/zh-tw/Attractions/All?page=1';
-    final response = await http
-        .get(Uri.parse(requestUrl), headers: {'accept': 'application/json'});
-    final attractionData = jsonDecode(response.body);
-
-    for (var eachAttraction in attractionData['data']) {
-      final attractionDetail = AttractionDetail(
-          id: eachAttraction['id'],
-          name: eachAttraction['name'],
-          introduction: eachAttraction['introduction'],
-          destric: eachAttraction['distric'],
-          tele: eachAttraction['tel'],
-          images: eachAttraction['images'],
-          address: eachAttraction['address'],
-          remind: eachAttraction['remind'],
-          url: eachAttraction['url']);
-      attractionDetailForGrid.add(attractionDetail);
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     getRecommend();
-    getAttraction();
+    Provider.of<Content>(context, listen: false).getAttraction();
     super.initState();
   }
 
@@ -183,17 +160,29 @@ class _AttractionState extends State<Attraction> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                         color: Color.fromARGB(255, 244, 242, 238)),
-                    child: GridView.builder(
-                        itemCount: attractionDetailForGrid.length - 6,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
-                        itemBuilder: ((context, index) {
-                          return GridViewTile(
-                              name: attractionDetailForGrid[index].name,
-                              destric: attractionDetailForGrid[index].destric,
-                              image: attractionDetailForGrid[index].images[0]
-                                  ['src']);
-                        })),
+                    child: content.attractionDetailForGrid.isNotEmpty
+                        ? GridView.builder(
+                            semanticChildCount:
+                                content.attractionDetailForGrid.length,
+                            itemCount:
+                                content.attractionDetailForGrid.length - 6,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2),
+                            itemBuilder: ((context, index) {
+                              return GridViewTile(
+                                  name: content
+                                      .attractionDetailForGrid[index].name,
+                                  destric: content
+                                      .attractionDetailForGrid[index].destric,
+                                  image: content.attractionDetailForGrid[index]
+                                      .images[0]['src']);
+                            }))
+                        : Center(
+                            child: SpinKitCircle(
+                            color: Color.fromARGB(255, 208, 190, 26),
+                            size: 50,
+                          )),
                   ),
                 )
               ],

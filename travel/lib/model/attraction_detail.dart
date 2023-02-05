@@ -5,7 +5,7 @@ class AttractionDetail {
   final String destric;
   final String tele;
   final String address;
-  final String remind;
+  final remind;
   final String url;
   final images;
 
@@ -15,9 +15,9 @@ class AttractionDetail {
     required this.introduction,
     required this.destric,
     required this.tele,
-    required this.images,
+    this.images,
     required this.address,
-    required this.remind,
+    this.remind,
     required this.url,
   });
 }

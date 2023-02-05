@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:travel/model/attraction_detail.dart';
 
 class Content extends ChangeNotifier {
+  List<AttractionDetail> attractionDetailForGrid = [];
   int _selectedIndex = 0;
+  String _requestedUrl =
+      'https://www.travel.taipei/open-api/zh-tw/Attractions/All?page=1';
   String _text = '旅遊景點';
   List<IconData> icons = [
     Icons.synagogue,
@@ -11,9 +17,16 @@ class Content extends ChangeNotifier {
     Icons.shopping_bag,
   ];
   List<Text> iconName = [Text('寺廟'), Text('食物'), Text('藝術'), Text('購物')];
+  List<String> categoryIds = [
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=14&page=1',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=144&page=1',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=15&page=1',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=145&page=1'
+  ];
 
   get selectedIndex => _selectedIndex;
   get text => _text;
+  get requestedUrl => _requestedUrl;
   Widget buildIcon(int index) {
     return Padding(
       padding: const EdgeInsets.all(19.1),
@@ -23,7 +36,9 @@ class Content extends ChangeNotifier {
             onTap: (() {
               _selectedIndex = index;
               _text = iconName[index].data.toString();
-              ;
+              _requestedUrl = categoryIds[index];
+              attractionDetailForGrid.clear();
+              getAttraction();
               notifyListeners();
             }),
             child: Container(
@@ -46,5 +61,27 @@ class Content extends ChangeNotifier {
         ],
       ),
     );
+  }
+
+  Future getAttraction() async {
+    final String requestUrl = requestedUrl;
+    final response = await http
+        .get(Uri.parse(requestUrl), headers: {'accept': 'application/json'});
+    final attractionData = jsonDecode(response.body);
+
+    for (var eachAttraction in attractionData['data']) {
+      final attractionDetail = AttractionDetail(
+          id: eachAttraction['id'],
+          name: eachAttraction['name'],
+          introduction: eachAttraction['introduction'],
+          destric: eachAttraction['distric'],
+          tele: eachAttraction['tel'],
+          images: eachAttraction['images'],
+          address: eachAttraction['address'],
+          remind: eachAttraction['remind'],
+          url: eachAttraction['url']);
+      attractionDetailForGrid.add(attractionDetail);
+    }
+    notifyListeners();
   }
 }

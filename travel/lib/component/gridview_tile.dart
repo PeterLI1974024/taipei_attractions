@@ -5,10 +5,7 @@ class GridViewTile extends StatelessWidget {
   final String destric;
   final image;
   const GridViewTile(
-      {super.key,
-      required this.name,
-      required this.destric,
-      required this.image});
+      {super.key, required this.name, required this.destric, this.image});
 
   @override
   Widget build(BuildContext context) {
