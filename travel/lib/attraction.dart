@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'component/reusable_icon.dart';
 import 'model/attraction_detail.dart';
 import 'component/pageview_tile.dart';
 import 'component/gridview_tile.dart';
@@ -19,6 +18,7 @@ class Attraction extends StatefulWidget {
 }
 
 class _AttractionState extends State<Attraction> {
+  final controller = ScrollController();
   List<AttractionDetail> attractionDetails = [];
 
   final String requestUrl =
@@ -50,6 +50,9 @@ class _AttractionState extends State<Attraction> {
     getRecommend();
     Provider.of<Content>(context, listen: false).getAttraction();
     super.initState();
+    controller.addListener(() {
+      if (controller.position.maxScrollExtent == controller.offset) {}
+    });
   }
 
   @override
@@ -164,8 +167,7 @@ class _AttractionState extends State<Attraction> {
                         ? GridView.builder(
                             semanticChildCount:
                                 content.attractionDetailForGrid.length,
-                            itemCount:
-                                content.attractionDetailForGrid.length - 6,
+                            itemCount: content.attractionDetailForGrid.length,
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:travel/model/attraction_detail.dart';
 
 class Content extends ChangeNotifier {
   List<AttractionDetail> attractionDetailForGrid = [];
+
   int _selectedIndex = 0;
   String _requestedUrl =
       'https://www.travel.taipei/open-api/zh-tw/Attractions/All?page=1';
@@ -82,6 +82,9 @@ class Content extends ChangeNotifier {
           url: eachAttraction['url']);
       attractionDetailForGrid.add(attractionDetail);
     }
+    attractionDetailForGrid.removeWhere(
+      (element) => element.images.isEmpty,
+    );
     notifyListeners();
   }
 }
