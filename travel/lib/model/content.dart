@@ -7,6 +7,7 @@ class Content extends ChangeNotifier {
   List<AttractionDetail> attractionDetailForGrid = [];
 
   int _selectedIndex = 0;
+  int page = 1;
   String _requestedUrl =
       'https://www.travel.taipei/open-api/zh-tw/Attractions/All?page=1';
   String _text = '旅遊景點';
@@ -18,10 +19,10 @@ class Content extends ChangeNotifier {
   ];
   List<Text> iconName = [Text('寺廟'), Text('食物'), Text('藝術'), Text('購物')];
   List<String> categoryIds = [
-    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=14&page=1',
-    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=144&page=1',
-    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=15&page=1',
-    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=145&page=1'
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=14&page=',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=144&page=',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=15&page=',
+    'https://www.travel.taipei/open-api/zh-tw/Attractions/All?categoryIds=145&page='
   ];
 
   get selectedIndex => _selectedIndex;
@@ -38,6 +39,7 @@ class Content extends ChangeNotifier {
               _text = iconName[index].data.toString();
               _requestedUrl = categoryIds[index];
               attractionDetailForGrid.clear();
+              page = 1;
               getAttraction();
               notifyListeners();
             }),
@@ -63,8 +65,8 @@ class Content extends ChangeNotifier {
     );
   }
 
-  Future getAttraction() async {
-    final String requestUrl = requestedUrl;
+  Future<void> getAttraction() async {
+    final String requestUrl = requestedUrl + page.toString();
     final response = await http
         .get(Uri.parse(requestUrl), headers: {'accept': 'application/json'});
     final attractionData = jsonDecode(response.body);
@@ -82,9 +84,11 @@ class Content extends ChangeNotifier {
           url: eachAttraction['url']);
       attractionDetailForGrid.add(attractionDetail);
     }
+
     attractionDetailForGrid.removeWhere(
       (element) => element.images.isEmpty,
     );
+
     notifyListeners();
   }
 }

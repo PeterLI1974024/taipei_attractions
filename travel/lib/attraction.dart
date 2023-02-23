@@ -18,6 +18,7 @@ class Attraction extends StatefulWidget {
 }
 
 class _AttractionState extends State<Attraction> {
+  bool hasMore = true;
   final controller = ScrollController();
   List<AttractionDetail> attractionDetails = [];
 
@@ -42,17 +43,19 @@ class _AttractionState extends State<Attraction> {
 
       attractionDetails.add(recommendDetail);
     }
-    setState(() {});
   }
 
   @override
   void initState() {
     getRecommend();
     Provider.of<Content>(context, listen: false).getAttraction();
-    super.initState();
     controller.addListener(() {
-      if (controller.position.maxScrollExtent == controller.offset) {}
+      if (controller.position.maxScrollExtent == controller.offset) {
+        Provider.of<Content>(context, listen: false).page++;
+        Provider.of<Content>(context, listen: false).getAttraction();
+      }
     });
+    super.initState();
   }
 
   @override
@@ -115,7 +118,7 @@ class _AttractionState extends State<Attraction> {
                       BoxDecoration(color: Color.fromARGB(255, 243, 241, 235)),
                   child: PageView.builder(
                       controller: PageController(viewportFraction: 0.8),
-                      itemCount: attractionDetails.length - 1,
+                      itemCount: attractionDetails.length,
                       itemBuilder: ((context, index) {
                         return GestureDetector(
                           onTap: () {
@@ -165,20 +168,66 @@ class _AttractionState extends State<Attraction> {
                         color: Color.fromARGB(255, 244, 242, 238)),
                     child: content.attractionDetailForGrid.isNotEmpty
                         ? GridView.builder(
+                            controller: controller,
                             semanticChildCount:
                                 content.attractionDetailForGrid.length,
-                            itemCount: content.attractionDetailForGrid.length,
+                            itemCount:
+                                content.attractionDetailForGrid.length + 1,
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2),
                             itemBuilder: ((context, index) {
-                              return GridViewTile(
-                                  name: content
-                                      .attractionDetailForGrid[index].name,
-                                  destric: content
-                                      .attractionDetailForGrid[index].destric,
-                                  image: content.attractionDetailForGrid[index]
-                                      .images[0]['src']);
+                              if (index <
+                                  content.attractionDetailForGrid.length) {
+                                return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: ((context) {
+                                        return Description(
+                                          image: content
+                                              .attractionDetailForGrid[index]
+                                              .images,
+                                          name: content
+                                              .attractionDetailForGrid[index]
+                                              .name,
+                                          destric: content
+                                              .attractionDetailForGrid[index]
+                                              .destric,
+                                          introduction: content
+                                              .attractionDetailForGrid[index]
+                                              .introduction,
+                                          telephone: content
+                                              .attractionDetailForGrid[index]
+                                              .tele,
+                                          address: content
+                                              .attractionDetailForGrid[index]
+                                              .address,
+                                          remind: content
+                                              .attractionDetailForGrid[index]
+                                              .remind,
+                                          url: content
+                                              .attractionDetailForGrid[index]
+                                              .url,
+                                        );
+                                      })));
+                                    },
+                                    child: GridViewTile(
+                                        name: content
+                                            .attractionDetailForGrid[index]
+                                            .name,
+                                        destric: content
+                                            .attractionDetailForGrid[index]
+                                            .destric,
+                                        image: content
+                                            .attractionDetailForGrid[index]
+                                            .images[0]['src']));
+                              } else {
+                                print(content.attractionDetailForGrid.length);
+                                return hasMore
+                                    ? Center(child: CircularProgressIndicator())
+                                    : Text('no more data');
+                              }
+                              ;
                             }))
                         : Center(
                             child: SpinKitCircle(
